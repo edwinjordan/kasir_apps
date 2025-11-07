@@ -1,0 +1,408 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Penjualan</ion-title>
+    <ion-buttons end>
+			<button ion-button icon-only (click)="setting()">
+				<ion-icon name="md-settings" style="color: black"></ion-icon>
+			</button>
+		</ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid>
+    <ion-row class="row-content">
+      <ion-col col-md-7 col-12 class="col-barang">
+        <ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput($event)" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 0; border-bottom: 2px solid #488aff; margin-bottom: 1px;"></ion-searchbar>
+        <ion-content class="content-produk" drag-content="false">
+					<ion-refresher (ionRefresh)="refresh($event)">
+						<ion-refresher-content></ion-refresher-content>
+					</ion-refresher>
+					<ion-grid>
+						<ion-row>
+							<ion-col col-md-4 col-6 *ngFor="let b of dataBarangUi; let i = index;">
+								<ion-card [style.background]="b.fn_qty > 0? '#f1f6ff' : '#fbd9d7'" [style.pointerEvents]="b.fn_qty > 0? 'unset' : 'none'" class="card-barang" (click)="tambahBeli(i)">
+									<ion-card-content>
+										<div class="c-text">
+											<div><b>{{b.fc_barcode}}</b></div>
+											<div><b>{{b.fv_namastock}}</b></div>
+											<div>brand : <b>{{b.fv_nmbrand? b.fv_nmbrand : '-'}}</b></div>
+											<div><b>{{b.fv_nmgroup}}</b></div>
+										</div>
+										<div class="c-harga">
+											<span class="c-primary"><b>{{b.fm_hargajual | currency:'Rp. ':'symbol':'.0':'id'}},-</b></span> ({{b.fn_qty > 0? b.fn_qty : '0'}})
+										</div>
+									</ion-card-content>
+                </ion-card>
+
+							</ion-col>
+						</ion-row>
+          </ion-grid>
+          <ion-row class="row">
+
+          </ion-row>
+        </ion-content>
+
+      </ion-col>
+      <ion-col col-md-5 col-12 class="col-keranjang" [class.modalShow]="showModal">
+        <div class="btn-samping" (click)="showModal = !showModal"><ion-icon name="arrow-back"></ion-icon></div>
+				<ion-segment [(ngModel)]="segKeranjang" swipeSegment style="flex: 0; height: 50px;">
+					<ion-segment-button value="infoNota">
+						Info Nota
+					</ion-segment-button>
+					<ion-segment-button value="barang">
+						Barang
+					</ion-segment-button>
+        </ion-segment>
+
+        <div #seg [ngSwitch]="segKeranjang" swipeSegment style="overflow: auto; height: 100%; background: #f1f6ff; margin-bottom: -10px; padding-bottom: 10px;">
+          <div *ngSwitchCase="'barang'" [style.marginBottom]="!hideTotal? '110px' : '10px'">
+            <ion-grid>
+							<ion-row>
+								<ion-col col-12 *ngFor="let bb of beliBarangUi; let ik = index;">
+									<ion-card>
+										<ion-card-content>
+											<div *ngFor="let bbb of bb?.barang; let i = index;" class="kel-barang">
+												<div style="flex: 1;"><b> {{bbb.fc_barcode}} - {{bbb.fv_namastock}}</b></div>
+												<div class="c-jumlah">
+													<div class="add-min" (click)="kurangJumlah(ik, bbb)">-</div>
+													<ion-input type="number" [(ngModel)]="bbb.jumlah" (ionChange)="changeJumlah(ik, bbb)" (ionFocus)="catFocus(false, $event)" (ionBlur)="catBlur()"></ion-input>
+													<div class="add-min" (click)="tambahJumlah(ik, bbb)">+</div>
+													<div class="hapus" (click)="hapusBarang(ik, i)"><ion-icon name="trash"></ion-icon></div>
+												</div>
+											</div>
+											<div class="card-footer">
+												<div style="display: flex; font-size: 9pt;">
+													<div style="flex: 1;">Harga Satuan </div>
+													<div style="margin-left: 10px; display: flex; align-items: center;">
+														<div *ngIf="bb.potPer" style="font-size: 8pt; line-height: 1px;">
+															<!-- <b>({{ bb.potPer? 'D' }})</b> -->
+															<span style="text-decoration: line-through;">{{bb.harga_asli | currency:'Rp. ':'symbol':'.0':'id'}},-</span>
+														</div>
+														<b class="c-primary" style="margin-left: 10px;">{{bb?.harga  | currency:'Rp. ':'symbol':'.0':'id'}},-</b>
+													</div>
+												</div>
+
+												<div style="display: flex;">
+													<b style="flex: 1;">Sub Total</b>
+													<div style="margin-left: 10px; display: flex; align-items: center;">
+														<b class="c-primary" style="margin-left: 10px;">{{bb?.sub_total | currency:'Rp. ':'symbol':'.0':'id'}},-</b>
+													</div>
+												</div>
+
+											</div>
+										</ion-card-content>
+									</ion-card>
+								</ion-col>
+							</ion-row>
+						</ion-grid>
+          </div>
+          <div *ngSwitchCase="'infoNota'" [style.marginBottom]="!hideTotal? '100px' : '10px'">
+            <ion-list class="nota-list">
+							<ion-item>
+								<ion-label>No Nota</ion-label>
+								<ion-input type="text" [value]="noNota" disabled style="font-weight: bold;"></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>Tanggal</ion-label>
+								<ion-input type="text" [value]="tanggal" disabled></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>Operator</ion-label>
+								<ion-input type="text" [value]="operator?.fv_nama" disabled></ion-input>
+		      		</ion-item>
+		      		<ion-item>
+		      			<ion-label>Nama Pelanggan</ion-label>
+		      			<ion-input type="text" [value]="pelanggan?.fv_nama? pelanggan?.fv_nama : 'Umum'" disabled (click)="openModalPelangan()"></ion-input>
+		      			<ion-icon item-content name="md-arrow-dropdown" style="margin-right: 5px; color: #999;"></ion-icon>
+		      		</ion-item>
+
+
+		      		<ion-item>
+		      			<ion-label>Alamat Pelanggan</ion-label>
+		      			<ion-input type="text" [value]="pelanggan?.fv_alamat? pelanggan?.fv_alamat : '-'" disabled></ion-input>
+		      		</ion-item>
+		      		<ion-item>
+		      			<ion-label>No Tlp Pelanggan</ion-label>
+		      			<ion-input type="text" [value]="pelanggan?.fc_notelp? pelanggan.fc_notelp : '-'" disabled></ion-input>
+		      		</ion-item>
+		      		<ion-item>
+		      			<ion-label>Catatan</ion-label>
+		      			<ion-textarea placeholder="Tulis Catatan Disini..." [(ngModel)]="catatan" (ionFocus)="catFocus(true)" (ionBlur)="catBlur()"></ion-textarea>
+		      		</ion-item>
+		      	</ion-list>
+          </div>
+        </div>
+        <div [style.transform]="!hideTotal? 'translateY(0px)' : 'translateY(130px)'" [style.opacity]="!hideTotal? '1' : '0'" class="c-total">
+		    	<ion-grid>
+		    		<ion-row>
+		    			<button class="simpan text" (click)="bayar()" [disabled]="beliBarangUi.length < 1">
+                BAYAR
+                <!-- <div *ngIf="!simpanLoading">BAYAR</div>
+		    				<ion-spinner *ngIf="simpanLoading"></ion-spinner> -->
+		    			</button>
+		    		</ion-row>
+		    	</ion-grid>
+		    </div>
+      </ion-col>
+    </ion-row>
+    <div class="c-total-penjualan">
+      <ion-grid>
+        <ion-row>
+          <ion-col col-md-5 col-sm-5 col-4 style="font-size: 15pt;">Total</ion-col>
+          <ion-col col-md-7 col-sm-7 col-8 class="harga">{{totalBelanja | currency:'Rp. ':'symbol':'.0':'id'}},-</ion-col>
+        </ion-row>
+        <!-- <ion-row>
+          <button class="simpan text" (click)="simpan()" [disabled]="beliBarangUi.length < 1">		<div *ngIf="!simpanLoading">SIMPAN</div>
+            <ion-spinner *ngIf="simpanLoading"></ion-spinner>
+          </button>
+        </ion-row> -->
+      </ion-grid>
+    </div>
+  </ion-grid>
+
+  <div [ngStyle]="showModalPelanggan? {'opacity': '1'} :  {'opacity': '0', 'z-index' : '-1'}" class="c-modal-customer">
+		<div class="modal">
+			<div class="title">Pilih Pelanggan</div>
+			<div class="c-cari">
+				<ion-item>
+					<ion-input (ionChange)="cariPelanggan()" [(ngModel)]="textCariPelanggan" placeholder="Cari pelanggan"></ion-input>
+				</ion-item>
+				<div class="tambah-pelanggan" (click)="modalTambahPelanggan()">
+					<ion-icon name="person-add"></ion-icon>
+				</div>
+			</div>
+			<div class="content">
+				<div>
+					<input type="radio" id="P-0" [value]="0" [(ngModel)]="pelangganUi">
+					<label for="P-0">Umum</label>
+				</div>
+				<div *ngFor="let pel of dataPelangganUi">
+					<input type="radio" [id]="'P-' + pel.fc_kdcust" [value]="pel" [(ngModel)]="pelangganUi">
+					<label [for]="'P-' + pel.fc_kdcust">{{pel.fc_kdcust}} - {{pel.fv_nama}} - <span style="text-transform: uppercase;">{{pel.fv_alamat}}</span></label>
+				</div>
+			</div>
+			<div class="button">
+				<div (click)="modalBatal()">Batal</div>
+				<div (click)="modalPelangganOk()">Ok</div>
+			</div>
+		</div>
+  </div>
+
+  <div *ngIf="showModalBayar" class="c-modal-pelanggan">
+		<div class="modal" style="width: 615px;">
+			<div class="title">Bayar {{pelanggan?.fc_kdtop}}</div>
+
+			<div class="content">
+        <section>
+          <button class="simpan text" >
+            {{totalBelanja | currency:'Rp. ':'symbol':'.0':'id'}},-
+          </button>
+
+            <ion-item >
+              <ion-label>Jenis Bayar</ion-label>
+              <ion-select [(ngModel)]="jenisPembayaran" (ionChange)="jenisPembayaranChange()">
+                <ion-option value="cash">CASH</ion-option>
+                <ion-option value="debit">DEBIT</ion-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item >
+              <ion-label>Tanggal Faktur</ion-label>
+              <div item-content class="sugesti">
+                <div class="c-uang">
+
+                  <div style="height: 10px; width: 15px; flex-shrink: 0;"></div>
+                </div>
+              </div>
+              <div item-content style="display: flex; width: 120px; flex-shrink: 0;">
+                <ion-input [value]="tanggal"></ion-input>
+                <!-- <ion-input [value]="pelanggan?.fv_nama? pelanggan?.fv_nama : 'Umum'" [(ngModel)]="jumlahTop"></ion-input> -->
+              </div>
+            </ion-item>
+
+            <ion-item *ngIf="jenisPembayaran == 'cash'">
+              <ion-label color="primary">Keuangan Cash</ion-label>
+              <ion-select [(ngModel)]="jenisKeuangan">
+                <ion-option [value]="null" selected>-- Pilih Keuangan -- </ion-option>
+                <ion-option *ngFor="let k of jenisKeuanganUI; let i = index" [value]="k">{{k.nama_keuangan}}</ion-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item *ngIf="jenisPembayaran == 'cash'" style="display: flex;">
+              <ion-label color="primary" fixed style="flex: 0;">Bayar Cash</ion-label>
+              <!-- <ion-input type="number" [(ngModel)]="potonganPenjualan"></ion-input> -->
+              <div item-content class="sugesti">
+                <div class="c-uang">
+                  <div *ngFor="let u of uang; let i = index;" class="uang" (click)="bayarKeuangan = bayarKeuangan + u">{{u | currency:'Rp. ':'symbol':'.0':'id'}}</div>
+                  <div style="height: 10px; width: 15px; flex-shrink: 0;"></div>
+                </div>
+              </div>
+              <div item-content style="display: flex; width: 120px; height: 100%; flex-shrink: 0;">
+                <div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px; color: #999;">Rp. </div>
+
+
+                <input currencyMask type="tel" [options]="{ prefix: '', align: 'right', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="bayarKeuangan" placeholder="0,-" [(ngModel)]="bayarKeuangan" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%;"/>
+              </div>
+              <div item-content style="height: 100%; display: flex; align-items: center; padding-left: 16px;">
+                <ion-icon name="close-circle" (click)="bayarKeuangan = 0"></ion-icon>
+              </div>
+            </ion-item>
+
+            <ion-item *ngIf="jenisPembayaran == 'debit'">
+              <ion-label color="primary">Keuangan Debit</ion-label>
+              <ion-select [(ngModel)]="jenisKeuanganDebit">
+                <ion-option *ngFor="let k of jenisKeuanganDebitUI; let i = index" [value]="k">{{k.nama_keuangan}}</ion-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item *ngIf="jenisPembayaran == 'debit'" style="display: flex;">
+              <ion-label color="primary" fixed style="flex: 0;">Bayar Debit</ion-label>
+              <!-- <ion-input type="number" [(ngModel)]="potonganPenjualan"></ion-input> -->
+              <div item-content class="sugesti">
+                <div class="c-uang">
+                  <div *ngFor="let u of uang; let i = index;" class="uang" (click)="bayarKeuanganDebit = bayarKeuanganDebit + u">{{u | currency:'Rp. ':'symbol':'.0':'id'}}</div>
+                  <div style="height: 10px; width: 15px; flex-shrink: 0;"></div>
+                </div>
+              </div>
+              <div item-content style="display: flex; width: 120px; height: 100%;">
+                <div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px; color: #999;">Rp. </div>
+                <input currencyMask type="tel" [options]="{ prefix: '', align: 'right', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="bayarKeuanganDebit" placeholder="0,-" [(ngModel)]="bayarKeuanganDebit" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%;"/>
+              </div>
+              <div item-content style="height: 100%; display: flex; align-items: center; padding-left: 16px;">
+                <ion-icon name="close-circle" (click)="bayarKeuanganDebit = 0"></ion-icon>
+              </div>
+            </ion-item>
+
+            <ion-item>
+
+                <ion-label color="primary" fixed>
+
+                  <div *ngIf="(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) >= 0">Kembalian</div>
+                  <div *ngIf="(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) < 0">Kekurangan</div>
+                </ion-label>
+                <div item-content class="sugesti">
+                  <div class="c-uang">
+
+                    <div style="height: 10px; width: 15px; flex-shrink: 0;"></div>
+                  </div>
+                </div>
+                <div item-content style="display: flex; width: 120px; flex-shrink: 0;">
+                  <div item-content *ngIf="(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) < 0" style="font-weight: bold; color: red">{{(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+                  <div item-content *ngIf="(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) == 0" style="font-weight: bold;" [style.color]="">{{(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+                  <div  item-content *ngIf="(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) > 0" style="font-weight: bold; color: green" [style.color]="">{{(bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+                </div>
+            </ion-item>
+        </section>
+			</div>
+      <div *ngIf="((bayarKeuangan + bayarKeuanganDebit) - (totalBelanja) < 0 && pelanggan?.fc_kdtop == 00)" style="padding: 16px; display: flex; align-items: center; justify-content: center; margin-top: -69px;">
+        <div style="background: rgba(245, 61, 61, 1); padding: 10px; font-weight: bold; border-radius: 10px; color: white; z-index: 10;">Pelanggan Tidak Dapat Melakukan T.O.P</div>
+      </div>
+			<div class="c-btn">
+        <!-- <div (click)="modalBatalBayar()">Batal</div> -->
+        <div class="batal-btn"><div (click)="modalBatalBayar()" style="width: fit-content; margin: auto;">BATAL</div></div>
+				<button class="bayar-btn" (click)="pembayaran()">
+          <div *ngIf="!bayarLoading" class="text">BAYAR</div>
+				  <ion-spinner *ngIf="bayarLoading"></ion-spinner>
+        </button>
+			</div>
+		</div>
+	</div>
+
+  <div *ngIf="showModalTambahPelanggan" class="c-modal-pelanggan">
+		<div class="modal modal-tp">
+			<div class="title">Tambah Pelanggan</div>
+			<div class="content-tp">
+				<ion-grid>
+					<ion-row>
+						<ion-col col-md-6 col-12>
+							<ion-item class="kode-p">
+								<ion-label color="primary" stacked>Kode Pelanggan</ion-label>
+								<ion-input placeholder="Kode Pelanggan" [value]="modalKodePelanggan" disabled></ion-input>
+							</ion-item>
+							<ion-item class="kode-p">
+								<ion-label color="primary" stacked>Nama Pelanggan</ion-label>
+								<ion-input placeholder="Nama Pelanggan" [(ngModel)]="modalNamaCust"></ion-input>
+							</ion-item>
+							<ion-item class="kode-p">
+								<ion-label color="primary" stacked>Alamat</ion-label>
+								<ion-input placeholder="Alamat Pelanggan" [(ngModel)]="modalAlamatCust"></ion-input>
+							</ion-item>
+							<ion-item class="kode-p">
+								<ion-label color="primary" stacked>Email</ion-label>
+								<ion-input placeholder="Email Pelanggan" [(ngModel)]="modalEmailCust"></ion-input>
+              </ion-item>
+              <ion-item class="kode-p">
+								<ion-label color="primary" stacked>No Telp</ion-label>
+								<ion-input placeholder="Telp Pelanggan" [(ngModel)]="modalTelpCust"></ion-input>
+							</ion-item>
+
+
+						</ion-col>
+						<ion-col col-md-6 col-12>
+							<ion-item>
+								<ion-label color="primary" stacked>No Ktp</ion-label>
+								<ion-input placeholder="No.Ktp Pelanggan" [(ngModel)]="modalKtpCust"></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label color="primary" stacked>Kota</ion-label>
+								<ion-input placeholder="Kota Pelanggan" [(ngModel)]="modalKotaCust"></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label color="primary" stacked>Profesi</ion-label>
+									<ion-select [(ngModel)]="modalProfesiCust">
+                    <ion-option *ngFor="let t of dataProfesi; let i = index;" value="{{ t.fc_kdprofesi }}" [selected]="i == 0">{{t.fv_nmprofesi}}</ion-option>
+                  </ion-select>
+							</ion-item>
+              <ion-item class="kode-p">
+								<ion-label color="primary" stacked>Status Angsur</ion-label>
+									<ion-select [(ngModel)]="modalStsCust">
+                    <ion-option value="Y">Ya</ion-option>
+                    <ion-option value="N">Tidak</ion-option>
+                  </ion-select>
+              </ion-item>
+              <ion-item>
+								<ion-label color="primary" stacked>TOP</ion-label>
+								<!-- <ion-input [(ngModel)]="modalTopCust.fn_jumlah" disabled></ion-input> -->
+								<ion-select [(ngModel)]="modalTopCust">
+		      				<ion-option *ngFor="let t of dataTop; let i = index;" value="{{ t.fc_kdtop }}" [selected]="i == 0">{{t.fv_nmtop}}</ion-option>
+		      			</ion-select>
+              </ion-item>
+              <ion-item>
+								<ion-label color="primary" stacked>Hold</ion-label>
+									<ion-select [(ngModel)]="modalHoldCust">
+                    <ion-option value="Y">Hold</ion-option>
+                    <ion-option value="N">No Hold</ion-option>
+                  </ion-select>
+							</ion-item>
+
+						</ion-col>
+					</ion-row>
+				</ion-grid>
+			</div>
+
+			<div class="button">
+				<div (click)="showModalTambahPelanggan = false; showModalPelanggan = true;">Batal</div>
+				<div (click)="tambahPelanggan()" style="display: flex; align-items: center; justify-content: center; position: relative; height: 50px;">
+					<ion-spinner *ngIf="simpanPelangganLoading" color="primary" style="position: absolute;"></ion-spinner>
+					<div *ngIf="!simpanPelangganLoading">Simpan</div>
+				</div>
+			</div>
+		</div>
+  </div>
+
+  <div *ngIf="showNotaModal" class="c-modal-pelanggan">
+		<div class="modal" style="width: 30%; padding: 0 16px;">
+			<div [innerHtml]="notaPrintHtml" style="flex: 1; overflow: scroll;"></div>
+			<div class="button" (click)="ambilNotaKecil()" style="justify-content: flex-end; padding: 10px 0;">
+				<div style="background: #488aff; color: white; border-radius: 10px; flex: 0; padding: 10px 36px;">Print</div>
+			</div>
+		</div>
+	</div>
+
+  <div [style.display]="showModalTambahPelanggan? 'block' : 'none'" class="modal-pelanggan-backdrop" style="z-index: 11;" (click)="showModalTambahPelanggan = false;"></div>
+  <div [ngStyle]="showModalPelanggan ? {'opacity': '1', 'z-index' : '4'} :  {'opacity': '0', 'z-index' : '-1'}" class="modal-pelanggan-backdrop" (click)="modalBatal()"></div>
+  <div [ngStyle]="showModalBayar ? {'opacity': '1', 'z-index' : '4'} :  {'opacity': '0', 'z-index' : '-1'}" class="modal-pelanggan-backdrop" (click)="modalBatal()"></div>
+  <div [ngStyle]="showNotaModal ? {'opacity': '1', 'z-index' : '4'} :  {'opacity': '0', 'z-index' : '-1'}" class="modal-pelanggan-backdrop" (click)="modalBatal()"></div>
+
+</ion-content>

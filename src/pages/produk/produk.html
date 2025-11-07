@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Penjualan</ion-title>
+    <ion-buttons end>
+			<button ion-button icon-only (click)="setting()">
+				<ion-icon name="md-settings" style="color: black"></ion-icon>
+			</button>
+		</ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 10px 10px 0 10px;">
+		<ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput()" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 0;"></ion-searchbar>
+	</div>
+  <ion-content class="content-produk" drag-content="false">
+    <ion-refresher (ionRefresh)="refresh($event)">
+			<ion-refresher-content></ion-refresher-content>
+		</ion-refresher>
+    <ion-grid>
+			<ion-row>
+				<ion-col col-lg-4 col-md-4 col-sm-6 col-12 offset-0 *ngFor="let b of dataBarangUi; let i = index;">	
+					<ion-card class="card-barang">
+						<ion-card-content style="display: flex; flex-direction: column; height: 100%;">
+							<div style="flex: 1;">
+								<div class="c-text" style="display: flex;"><div class="title" style="flex: 1;">Kode Barang</div><div>:</div><b class="text" style="flex: 1;margin-left: 5px;">{{b.fc_kdstock}}</b></div>
+								<div class="c-text" style="display: flex;"><div class="title" style="flex: 1;">Nama Barang</div><div>:</div><b class="text" style="flex: 1;margin-left: 5px;">{{b.fv_namastock}}</b></div>
+								<div class="c-text" style="display: flex;"><div class="title" style="flex: 1;">Tipe</div><div>:</div><b class="text" style="flex: 1;margin-left: 5px;">{{b.fv_nmtipe}}</b></div>
+								<div class="c-text" style="display: flex;"><div class="title" style="flex: 1;">Brand</div><div>:</div><b class="text" style="flex: 1;margin-left: 5px;">{{b.fv_nmbrand}}</b></div>
+								<div class="c-text" style="display: flex;"><div class="title" style="flex: 1;">Group</div><div>:</div><b class="text" style="flex: 1;margin-left: 5px;">{{b.fv_nmgroup}}</b></div>
+								
+							</div>
+							<div class="c-button">
+								<div class="c-barcode" style="text-align: center;">
+												<ngx-barcode [bc-value]="b.fc_barcode" [bc-height]="40" [bc-width]="1.3" [bc-display-value]="true"></ngx-barcode>
+								</div>
+                
+							</div>
+              <div class="c-button">
+								<button ion-button (click)="detailBarang(i)">Detail</button>
+							</div>
+						</ion-card-content>
+					</ion-card>
+				</ion-col>
+			</ion-row>
+		</ion-grid>
+  </ion-content>
+</ion-content>

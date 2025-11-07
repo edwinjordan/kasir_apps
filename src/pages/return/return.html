@@ -1,0 +1,232 @@
+<!--
+  Generated template for the ReturnPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Return Penjualan</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="setting()">
+    		<ion-icon name="md-settings" style="color: black"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-grid>
+		<ion-row class="row-content">
+      <ion-col col-md-7 col-12 class="col-nota">
+        <div style="display: flex; border-bottom: 2px solid #488aff; margin-bottom: 1px;">
+					<ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput()" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 1; padding-right: 0;"></ion-searchbar>
+					<div style="display: flex; align-items: center;">
+						<ion-item>
+							<ion-select [(ngModel)]="pilihanCari" style="max-width: unset;">
+								<ion-option value="3">No Faktur</ion-option>
+								<ion-option value="4">No Pelanggan</ion-option>
+								<ion-option value="5">Nama Pelanggan</ion-option>
+							</ion-select>
+						</ion-item>
+					</div>
+        </div>
+
+        <ion-content class="content-produk" drag-content="false">
+					<ion-refresher (ionRefresh)="refresh($event)">
+						<ion-refresher-content></ion-refresher-content>
+          </ion-refresher>
+
+          <ion-grid>
+						<ion-row>
+							<ion-col col-lg-6 col-sm-6 col-12 *ngFor="let c of dataHasilCariUi; let i = index;" (click)="pilihNota(c)">
+								<ion-card [class.nota-pilih]="c.fn_idpenjualan == detailNota?.fn_idpenjualan" class="card-nota">
+									<ion-card-content>
+										<div class="c-text">
+											<div><b>No Nota </b>: <div class="nota">{{c.fc_nofaktur}}</div></div>
+											<div><b>Pelanggan </b>: <div>{{c.fc_kdcust}} - <b>{{c.fv_nama? c.fv_nama : 'Umum'}}</b></div></div>
+											<div><b>Tgl </b>: <div>{{c.tanggal}}</div></div>
+											<!-- <div><b>Total </b>: <div class="nota">{{c.total_harga | currency:'Rp. ':'symbol':'.0':'id'}},-</div></div> -->
+										</div>
+										<div class="c-harga">
+										</div>
+									</ion-card-content>
+								</ion-card>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+        </ion-content>
+      </ion-col>
+      <ion-col col-md-5 col-12 class="col-keranjang" [class.modalShow]="showModal">
+        <div class="btn-samping" (click)="showModal = !showModal"><ion-icon name="arrow-back"></ion-icon></div>
+				<ion-segment [(ngModel)]="segKeranjang" swipeSegment style="flex: 0; height: 50px;">
+					<ion-segment-button value="barang">
+						Barang
+					</ion-segment-button>
+					<ion-segment-button value="infoNota">
+						Info Nota
+					</ion-segment-button>
+        </ion-segment>
+        <div #seg [ngSwitch]="segKeranjang" swipeSegment style="overflow: auto; flex: 1; background: #f1f6ff; margin-bottom: -10px; padding-bottom: 10px;">
+					<div *ngSwitchCase="'barang'">
+            <ion-grid>
+              <ion-row style="padding-bottom: 70px;">
+                <ion-col col-12 *ngFor="let bb of barangNota; let ik = index;">
+                  <ion-card>
+                    <ion-card-content>
+                      <div class="kel-barang">
+												<div style="flex: 1;">
+													<!-- <b>{{bb.all_nama_barang}}</b> -->
+													<b>{{bb.fv_namastock}}</b>
+												</div>
+												<div class="c-jumlah">
+													<div>Qty: <b>{{bb.fn_qty}}</b></div>
+													<!-- <div class="add-min" (click)="kurangJumlah(ik, bbb)">-</div> -->
+													<!-- <ion-input type="number" [(ngModel)]="bb.total_stok" disabled></ion-input> -->
+													<!-- <div class="add-min" (click)="tambahJumlah(ik, bbb)">+</div> -->
+													<!-- <div class="hapus" (click)="hapusBarang(ik, i)"><ion-icon name="trash"></ion-icon></div> -->
+												</div>
+                      </div>
+                      <div class="card-footer">
+												<div style="display: flex; font-size: 9pt;">
+													<div style="flex: 1;">Harga Satuan </div>
+													<div style="margin-left: 10px; display: flex; align-items: center;">
+														<b class="c-primary" style="margin-left: 10px;">{{bb?.fm_price | currency:'Rp. ':'symbol':'.0':'id'}},-</b>
+													</div>
+												</div>
+
+												<div style="display: flex;">
+													<b style="flex: 1;">Sub Total</b>
+													<div style="margin-left: 10px; display: flex; align-items: center;">
+														<b class="c-primary" style="margin-left: 10px;">{{bb?.fn_qty * bb?.fm_price | currency:'Rp. ':'symbol':'.0':'id'}},-</b>
+													</div>
+												</div>
+											</div>
+											<button class="return-btn" (click)="pilihBarang(bb)">Return</button>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <div *ngSwitchCase="'infoNota'" [style.marginBottom]="!hideTotal? '100px' : '10px'">
+            <ion-list class="nota-list">
+							<ion-item>
+								<ion-label>Tanggal</ion-label>
+								<ion-input type="text" [value]="detailNota?.tanggal" disabled></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>Operator</ion-label>
+								<ion-input type="text" [value]="detailNota?.fc_kdkaryawan" disabled></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>Nama Pelanggan</ion-label>
+								<ion-input type="text" [value]="!detailNota? '' : detailNota.fv_nama? detailNota.fv_nama : 'Umum'" disabled></ion-input>
+								<!-- <ion-input type="text" [value]="detailNota?.nama" disabled (click)="showInputText('Nama Pelanggan', detailNota?.nama)"></ion-input> -->
+							</ion-item>
+							<ion-item>
+								<ion-label>Alamat Pelanggan</ion-label>
+								<ion-input type="text" [value]="detailNota?.fv_alamat? detailNota?.fv_alamat : '-'" disabled></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>No Tpl Pelanggan</ion-label>
+								<ion-input type="text" [value]="detailNota?.fc_notelp? detailNota?.fc_notelp : '-'" disabled></ion-input>
+							</ion-item>
+							<ion-item>
+								<ion-label>Catatan</ion-label>
+								<ion-textarea placeholder="Tulis Catatan Disini..." [value]="detailNota?.fv_memo? detailNota?.fv_memo : '-'"></ion-textarea>
+							</ion-item>
+						</ion-list>
+          </div>
+        </div>
+
+        <div [style.transform]="!hideTotal? 'translateY(0px)' : 'translateY(130px)'" [style.opacity]="!hideTotal? '1' : '0'" class="c-total">
+		    	<ion-grid>
+		    		<!-- <ion-row>
+		    			<ion-col col-md-5 col-12>Total</ion-col>
+		    			<ion-col col-md-7 col-12 class="harga">{{totalBelanja | currency:'Rp. ':'symbol':'.0':'id'}},-</ion-col>
+		    		</ion-row> -->
+		    		<ion-row>
+		    			<button [disabled]="!detailNota" class="simpan" (click)="detailNota = null; barangNota = null; showModal = false;">BATAL</button>
+		    		</ion-row>
+		    	</ion-grid>
+		    </div>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div [style.display]="showModal? 'block' : 'none'" class="modal-backdrop" (click)="showModal = false"></div>
+</ion-content>
+
+<div *ngIf="showReturn" style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 9;" (click)="showReturn = false"></div>
+<div *ngIf="showReturn" class="modal-return">
+	<div class="c-modal">
+		<div class="header">Return</div>
+
+		<div class="c-content">
+			<div>
+				<ion-list>
+					<ion-item>
+						<ion-label color="primary" fixed>Barang</ion-label>
+						<!-- <ion-select [(ngModel)]="modalBarangPilih" (ionChange)="modalJumlahReturn = 1">
+							<ion-option *ngFor="let d of modalData?.barang; let i = index" [value]="d">{{modalData?.nama_barang}}/{{d.warna}}</ion-option>
+						</ion-select> -->
+						<div item-content>
+							<b>{{modalData?.fv_namastock}}</b>
+							<!-- <span *ngFor="let d of modalData?.barang" class="warna">{{d.warna}}/{{d.qty}}</span> -->
+						</div>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>Jumlah Return</ion-label>
+						<div item-content class="c-jumlah">
+							<div class="add-min" (click)="kurangJumlah()">-</div>
+							<ion-input type="number" [(ngModel)]="modalJumlahReturn" disabled></ion-input>
+							<!-- <div><b>{{modalData?.fn_qty}}</b></div> -->
+							<div class="add-min" (click)="tambahJumlah()">+</div>
+						</div>
+            <!-- <ion-input type="text"  [value]="modalData?.fn_qty" [(ngModel)]="modalJumlah" style="max-width: 100px; border-bottom: 1px solid #9E9E9E;"></ion-input> -->
+
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>Pengembalian</ion-label>
+						<div item-content style="color: #488aff; font-weight: bold;">{{modalData?.fn_qty * modalData?.fm_price | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+					</ion-item>
+					<!-- <ion-item>
+						<ion-label color="primary" fixed>Pilihan Return</ion-label>
+						<ion-select [(ngModel)]="modalPilihanReturn">
+							<ion-option value="0">-- Pilih Metode Return --</ion-option>
+							<ion-option value="tunai">Tunai</ion-option>
+							<ion-option value="saldo" *ngIf="detailNota.nama">Saldo</ion-option>
+						</ion-select>
+					</ion-item> -->
+					<ion-item>
+						<ion-label color="primary" fixed>Keuangan</ion-label>
+						<ion-select [(ngModel)]="modalKeuanganPilih">
+							<ion-option *ngFor="let k of modalDataKeuangan; let i = index" [value]="k">{{k.nama_keuangan}}</ion-option>
+						</ion-select>
+					</ion-item>
+					<ion-item>
+						<ion-label>Keterangan</ion-label>
+						<ion-textarea placeholder="Tulis Keterangan Disini..." [(ngModel)]="modalKeterangan"></ion-textarea>
+          </ion-item>
+          <!-- <ion-item>
+
+          </ion-item> -->
+				</ion-list>
+			</div>
+    </div>
+    <div *ngIf="(modalJumlahReturn > modalData?.fn_qty)" style="padding: 16px; display: flex; align-items: center; justify-content: center;">
+			<div style="background: rgba(245, 61, 61, 1); padding: 10px; font-weight: bold; border-radius: 10px; color: white; z-index: 10;">Quantity Return Lebih Dari Quantity Invoice</div>
+		</div>
+		<div class="c-btn">
+			<div class="batal-btn"><div (click)="showReturn = false" style="width: fit-content; margin: auto;">BATAL</div></div>
+			<button class="bayar-btn" [disabled]="(modalJumlahReturn > modalData?.fn_qty)" (click)="simpanReturn()">
+				<div *ngIf="!simpanLoading" class="text">SIMPAN</div>
+				<ion-spinner *ngIf="simpanLoading"></ion-spinner>
+			</button>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,70 @@
+// http://ionicframework.com/docs/theming/
+
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+.ambilPhoto{
+	.alert-md .alert-head{
+		text-align: center !important;;
+	}
+
+	.alert-md .alert-button-group{
+		padding-left: 0 !important;;
+		padding-right: 0 !important;;
+	}
+
+	.alert-md .alert-button .button-inner{
+		justify-content: center !important;
+	}
+	.alert-md .alert-head{
+		display: none !important;
+	}
+
+	.alert-md .alert-button{
+		width: 100% !important;
+	}
+
+}
+
+// add danger and warning for alert
+
+
+@media (min-width:0px) and (max-width: 576px) {
+	.tabs[tabsLayout=icon-top] .has-icon .tab-button-text{
+		display: none !important;
+	}
+}
+
+.ambil-photo {
+	.alert-head{
+		text-align: center;
+	}
+	.alert-button-group{
+		display: flex;
+		justify-content: center;
+		padding: 8px;
+	}
+}
+
+ion-navbar{
+	.icon{
+		font-size: 1.4em !important;
+	}
+}
+
+.refresher-pulling-icon{
+	ion-icon{
+		color: #304ffe !important;
+	}
+}

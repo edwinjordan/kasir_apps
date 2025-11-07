@@ -1,0 +1,14 @@
+{
+  "name": "Pos-app",
+  "integrations": {
+    "cordova": {},
+    "capacitor": {}
+  },
+  "type": "custom",
+  "proxies": [
+    {
+      "path": "/api",
+      "proxyUrl": "http://robertlawoffice.com/backend/"
+    }
+  ]
+}

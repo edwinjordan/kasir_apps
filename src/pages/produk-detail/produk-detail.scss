@@ -1,0 +1,154 @@
+page-produk-detail {
+
+	ion-grid{
+		height: 100%;
+	}
+
+	ion-card{
+		margin: 0 !important;
+		width: unset !important;
+		border-radius: 10px !important;
+		height: 100%;
+	}
+
+	.searchbar{
+		background: none !important;
+		// margin-top: 10px;
+
+		input{
+			background: #fff !important;
+			box-shadow: 0 1px 2px rgba(98, 154, 255, 0.3) !important;
+		}
+		
+		.searchbar-input{
+			border-radius: 10px;
+		}
+	}
+
+	.c-barang{
+		// margin-top: 10px;
+		// padding: 0 10px;
+		margin: 10px 10px 0 10px;
+    box-shadow: 0 1px 2px rgba(98,154,255,.3)!important;
+    border-radius: 10px;
+    padding: 10px;
+    background: #488aff;
+    color: white;
+
+		// ion-card{
+		// 	display: flex;
+		// 	align-items: center;
+		// 	padding: 16px;
+		// 	box-shadow: 0 1px 2px rgba(98, 154, 255, 0.3) !important;
+		// 	background: #f1f6ff !important;
+		// }
+
+		.col{
+			display: flex !important;
+		}
+	}
+
+	.title{
+		flex: 0;
+		min-width: 95px;
+	}
+
+	.value{
+		flex: 1;
+		margin-left: 5px;
+	}
+
+	.c-detail-barang{
+		margin-top: 10px;
+		padding: 0 10px;
+		height: 100%;
+		overflow: hidden;
+
+		& > .col{
+			height: 100%;
+		}
+
+		ion-col{
+			display: flex;
+			flex-direction: column;
+			
+			ion-segment{
+				flex: 0;
+			}
+
+			.c-segment-b{
+				background: #f1f6ff;
+				height: 100%;
+				overflow: hidden;
+				display: flex;
+
+				& > div {
+					display: flex;
+					flex-direction: column;
+					width: 100%;
+				}
+			}
+
+			ion-card{
+				padding: 10px;
+
+				.c-varian{
+					display: flex;
+				}
+
+				.c-barcode{
+					display: flex;
+					justify-content: center;
+				}
+			}
+
+		}
+	}
+
+	.modal-varian{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		ion-card{
+			padding: 10px;
+
+			.c-varian{
+				display: flex;
+			}
+			.title{
+				flex: 1 !important;
+			}
+		}
+
+		.header{
+			padding: 10px;
+			text-align: center;
+			font-weight: bold;
+			font-size: 16pt;
+			background: #488aff;
+			color: white;
+		}
+	}
+
+	line{
+		stroke: #488aff !important;
+	}
+
+	.spinner-md-crescent circle{
+		stroke: #488aff !important;	
+	}
+
+	.content-produk{
+		margin-top: 1px;
+		background: transparent;
+		
+		.scroll-content{
+			border-top: none !important;
+			margin-bottom: 0 !important;
+		}
+	}
+}

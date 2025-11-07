@@ -1,0 +1,183 @@
+<ion-header>
+	<ion-navbar>
+		<ion-title>
+			Transaksi
+		</ion-title>
+		<ion-buttons end>
+      <button ion-button icon-only (click)="setting()">
+    		<ion-icon name="md-settings" style="color: black"></ion-icon>
+      </button>
+    </ion-buttons>
+	</ion-navbar>
+</ion-header>
+
+<ion-content>
+	<ion-grid>
+		<ion-row class="row-content">
+			<ion-col class="col-bpb">
+				<div style="display: flex; align-items: center;">
+					<ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput($event)" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 1; border-bottom: 2px solid #488aff; margin-bottom: 1px;"></ion-searchbar>
+					<div class="c-btn" style="padding: 0 10px;">
+						<button style="margin-top: 0; padding: 10px 20px; font-weight: bold;" (click)="tambahTransaksi()">TAMBAH TRANSAKSI</button>
+					</div>
+				</div>
+				<ion-content class="content-produk" drag-content="false">
+					<ion-refresher (ionRefresh)="refresh($event)">
+						<ion-refresher-content></ion-refresher-content>
+					</ion-refresher>
+					<ion-grid>
+						<ion-row>
+							<ion-col col-md-4 col-sm-6 col-12 *ngFor="let b of transaksiUi; let i = index;">
+								<ion-card class="card-bpb" [class.nota-pilih]="b.kode_transaksi_master == transaksiPilih?.kode_transaksi_master">
+									<ion-card-content>
+										<div class="c-text">
+											<div><b>Tanggal </b>: <div>{{b.tgl_transaksi_master}}</div></div>
+											<div><b>Uraian </b>: <div class="nota">{{b.nama_transaksi_akun}}</div></div>
+											<div><b>Keuangan </b>: <div style="text-transform: capitalize;">{{b.nama_keuangan}}</div></div>
+											<div *ngIf="b.debit_transaksi_master > 0"><b>Pemasukan </b>: <div>{{b.debit_transaksi_master | currency:'Rp. ':'symbol':'.0':'id'}},-</div></div>
+											<div *ngIf="b.kredit_transaksi_master > 0"><b>Pengeluaran </b>: <div>{{b.kredit_transaksi_master | currency:'Rp. ':'symbol':'.0':'id'}},-</div></div>
+											<div><b>Keterangan </b>: <div>{{b.keterangan_transaksi_master }}</div></div>
+											<div class="c-img">
+												<img [src]="b.lampiran == '' || b.lampiran == null? 'assets/imgs/no_image.jpg' : serverUrlImg + b.lampiran">
+											</div>
+											<div class="c-btn">
+												<button (click)="editTransaksi(b)">Edit</button>
+											</div>
+										</div>
+									</ion-card-content>
+								</ion-card>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+				</ion-content>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+	<div *ngIf="openModalUpdate || openModalAdd" style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,.4); top: 0; left: 0;" (click)="hideModelUpdate(); hideModelAdd();"></div>
+	<div class="c-modal" [style.transform]="openModalUpdate? 'translateX(0px)' : 'translateX(350px)'">
+		<div style="display: flex; padding: 10px; background: #488aff; color: white;">
+			<ion-icon name="close" (click)="hideModelUpdate()" style="width: 20px; display: flex; align-items: center; justify-content: center;"></ion-icon>
+			<div style="flex: 1; text-align: center; font-weight: bold; font-size: 12pt;">Edit Transaksi</div>
+		</div>
+		<div class="c-content">
+			<ion-item>
+				<ion-label color="primary" stacked>Jenis Transaksi</ion-label>
+				<ion-input disabled [value]="transaksiPilih.status_transaksi_master == 6? 'PEMASUKAN' : 'PENGELUARAN'" class="i-dis"></ion-input>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Nama Uraian</ion-label>
+				<ion-select name="nama" [(ngModel)]="transaksiPilih.no_faktur">
+					<ion-option *ngFor="let u of uraianUi;" [value]="u.id_transaksi_akun" [selected]="u.id_transaksi_akun == transaksiPilih.no_faktur">{{u.nama_transaksi_akun}}</ion-option>
+				</ion-select>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Jenis Keuangan</ion-label>
+				<ion-select name="nama" [(ngModel)]="transaksiPilih.kode_nama_keuangan">
+					<ion-option *ngFor="let k of keuanganUi;" [value]="k.kode_nama_keuangan" [selected]="k.kode_nama_keuangan == transaksiPilih.kode_nama_keuangan">{{k.nama_keuangan}}</ion-option>
+				</ion-select>
+			</ion-item>
+			<ion-item *ngIf="!transaksiPilih.kredit_transaksi_master || transaksiPilih.kredit_transaksi_master > 0">
+				<ion-label color="primary" stacked>Total (Pengeluaran)</ion-label>
+				<div item-content style="display: flex; width: 100%;">
+					<div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px;">Rp. </div>
+					<input currencyMask type="tel" [options]="{ prefix: '', align: 'left', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="kredit_transaksi_master" placeholder="0,-" [(ngModel)]="total" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%; background: transparent;"/>
+				</div>
+			</ion-item>
+			<ion-item *ngIf="transaksiPilih.debit_transaksi_master && transaksiPilih.debit_transaksi_master > 0">
+				<ion-label color="primary" stacked>Total (Pemasukan)</ion-label>
+				<div item-content style="display: flex; width: 100%;">
+					<div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px;">Rp. </div>
+					<input currencyMask type="tel" [options]="{ prefix: '', align: 'left', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="debit_transaksi_master" placeholder="0,-" [(ngModel)]="total" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%; background: transparent;"/>
+				</div>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Keterangan</ion-label>
+				<ion-input placeholder="Tulis Keterangan" [(ngModel)]="keterangan"></ion-input>
+			</ion-item>
+			<ion-item class="c-ambil-foto">
+				<ion-label color="primary" stacked>Foto Lampiran</ion-label>
+				<div item-content class="c-btn" style="width: 100%">
+					<button style="width: fit-content" (click)="ambilPhoto()">Ambil Photo</button>
+					<div>
+						<!-- <div *ngIf="selectedFilesNativeUi || bpbPilih?.image" style="position: relative;"><ion-icon name="md-close" style="position: absolute; right: 5px; top: 16px; background: #f53d3d; color: white; padding: 3px 8px 5px 8px; border-radius: 50%;" (click)="hapusGambar()"></ion-icon></div> -->
+						<img class="img-file" [src]="selectedFilesNativeUi? selectedFilesNativeUi : transaksiPilih.lampiran == '' || !transaksiPilih.lampiran? 'assets/imgs/no_image.jpg' : serverUrlImg + transaksiPilih.lampiran">
+					</div>
+
+					<!-- <input type="file" class="custom-file-input" (change)="selectFile($event)">
+					<img class="img-file" [src]="selectedFilesUi? selectedFilesUi : transaksiPilih.lampiran == '' || !transaksiPilih.lampiran? 'assets/imgs/no_image.jpg' : serverUrlImg + transaksiPilih.lampiran"> -->
+				</div>
+			</ion-item>
+			<br>
+		</div>
+		<div class="c-btn c-simpan">
+			<div style="text-align: center; color: #fff;" (click)="hideModelUpdate()">Batal</div>
+			<button (click)="simpan()" class="bayar-btn" [disabled]="total <= 0">
+				<div *ngIf="!simpanLoading" class="text">SIMPAN</div>
+				<ion-spinner *ngIf="simpanLoading"></ion-spinner>
+			</button>
+		</div>
+	</div>
+
+	<div class="c-modal" [style.transform]="openModalAdd? 'translateX(0px)' : 'translateX(350px)'">
+		<div style="display: flex; padding: 10px; background: #488aff; color: white;">
+			<ion-icon name="close" (click)="hideModelAdd()" style="width: 20px; display: flex; align-items: center; justify-content: center;"></ion-icon>
+			<div style="flex: 1; text-align: center; font-weight: bold; font-size: 12pt;">Tambah Transaksi</div>
+		</div>
+		<div class="c-content">
+			<ion-item>
+				<ion-label color="primary" stacked>Jenis Transaksi</ion-label>
+				<ion-select name="nama" [(ngModel)]="jenisTransaksi"  (ionChange)="ubahJenisTransaksi()">
+					<ion-option value="0" selected>--Pilih Jenis Transaksi--</ion-option>
+					<ion-option value="pemasukan">PEMASUKAN</ion-option>
+					<ion-option value="pengeluaran">PENGELUARAN</ion-option>
+				</ion-select>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Nama Uraian</ion-label>
+				<ion-select name="nama" [(ngModel)]="namaUraian">
+					<ion-option value="0" selected>--Pilih Nama Uraian--</ion-option>
+					<ion-option *ngFor="let u of uraianUi;" [value]="u">{{u.nama_transaksi_akun}}</ion-option>
+				</ion-select>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Jenis Keuangan</ion-label>
+				<ion-select name="nama" [(ngModel)]="jenisKeuangan">
+					<ion-option value="0" selected>--Pilih Keuangan--</ion-option>
+					<ion-option *ngFor="let k of keuanganUi;" [value]="k">{{k.nama_keuangan}}</ion-option>
+				</ion-select>
+			</ion-item>
+			<ion-item >
+				<ion-label color="primary" stacked>Total</ion-label>
+				<div item-content style="display: flex; width: 100%;">
+					<div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px;">Rp. </div>
+					<input currencyMask type="tel" [options]="{ prefix: '', align: 'left', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="total" placeholder="0,-" [(ngModel)]="total" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%; background: transparent;"/>
+				</div>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Keterangan</ion-label>
+				<ion-input placeholder="Tulis Keterangan" [(ngModel)]="keterangan"></ion-input>
+			</ion-item>
+			<ion-item class="c-ambil-foto">
+				<ion-label color="primary" stacked>Foto Lampiran</ion-label>
+				<div item-content class="c-btn" style="width: 100%">
+					<button style="width: fit-content" (click)="ambilPhoto()">Ambil Photo</button>
+					<div>
+						<!-- <div *ngIf="selectedFilesNativeUi || bpbPilih?.image" style="position: relative;"><ion-icon name="md-close" style="position: absolute; right: 5px; top: 16px; background: #f53d3d; color: white; padding: 3px 8px 5px 8px; border-radius: 50%;" (click)="hapusGambar()"></ion-icon></div> -->
+						<img *ngIf="selectedFilesNativeUi" class="img-file" [src]="selectedFilesNativeUi">
+					</div>
+					<!--
+					<input type="file" class="custom-file-input" (change)="selectFile($event)">
+					<img *ngIf="selectedFilesUi" class="img-file" [src]="selectedFilesUi"> -->
+				</div>
+			</ion-item>
+			<br>
+		</div>
+		<div class="c-btn c-simpan">
+			<div style="text-align: center; color: #fff;" (click)="hideModelAdd()">Batal</div>
+			<button (click)="tambah()" class="bayar-btn" [disabled]="total <= 0">
+				<div *ngIf="!simpanLoading" class="text">SIMPAN</div>
+				<ion-spinner *ngIf="simpanLoading"></ion-spinner>
+			</button>
+		</div>
+	</div>
+</ion-content>

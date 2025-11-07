@@ -1,0 +1,195 @@
+.nota-pilih{
+	background: #488aff !important;
+	color: #fff;
+	.nota{
+		color: white !important;
+	}
+	.c-btn{
+		button{
+			background: white !important;
+			color: #488aff !important;
+		}
+	}
+}
+
+page-nota {
+	ion-grid{
+		height: 100%;
+		padding-bottom: 0 !important;
+	}
+
+	ion-card{
+		margin: 0 !important;
+		width: unset !important;
+		border-radius: 10px !important;
+	}
+	.searchbar{
+		background: none !important;
+
+		input{
+			background: #f1f6ff !important;
+			box-shadow: 0 1px 2px rgba(98, 154, 255, 0.3) !important;
+		}
+	}
+	.c-primary{
+		color: #304ffe;
+	}
+
+	ion-segment-button{
+		height: 100% !important;
+	}
+
+	.item-md.item-input.ng-valid.item-input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner, .item-md.item-input.ng-valid.input-has-value:not(.input-has-focus):not(.item-input-has-focus) .item-inner{
+		border-bottom-color: #dedede !important;
+		box-shadow: unset !important;
+	}
+
+	.row-content{
+		height: 100%;
+		overflow: hidden;
+
+		.col-nota{
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			padding-bottom: 0 !important;
+
+			.searchbar-input{
+				border-radius: 10px;
+			}
+			.item-ios.item-block .item-inner{
+				border: none !important;
+			}
+
+			.card-nota{
+				height: 100%;
+				box-shadow: 0 1px 2px rgba(98, 154, 255, 0.3) !important;
+				background: #f1f6ff;
+				box-sizing: border-box;
+
+				&:active{
+					background: #d6e5ff;
+				}
+				ion-card-content{
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+
+					.c-text{
+						flex: 1;
+						display: flex;
+						flex-direction: column;
+
+						& > div{
+							display: flex;
+
+							.nota{
+								color: color($colors, primary);
+								font-weight: bold;
+								white-space: break-spaces !important;
+							}
+							b{
+								flex: 0;
+								min-width: 74px;
+							}
+							div{
+								flex: 1;
+								margin-left: 5px;
+								text-overflow: ellipsis;
+								overflow: hidden;
+								white-space: nowrap;
+							}
+						}
+					}
+					.c-harga{
+						flex: 0;
+					}
+				}
+			}
+		}
+	}
+
+	.backdrop{
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+    background: rgba(0,0,0,.5);
+    z-index: 9;
+	}
+
+	.nota-print{
+		position: absolute;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    .modal{
+    	background: white;
+    	padding: 10px;
+    	border-radius: 10px;
+    	z-index: 10;
+    	display: flex;
+    	flex-direction: column;
+
+    	.header{
+    		display: flex;
+    		align-items: center;
+    		justify-content: center;
+    		padding-bottom: 10px;
+    	}
+    	.nota{
+    		flex: 1;
+    		overflow: scroll;
+				border: 1px solid #488aff;
+				background: white;
+				padding: 10px;
+    	}
+
+    	.footer{
+    		margin-top: 10px;
+    		display: flex;
+    		text-align: center;
+
+    		.batal{
+    			flex: 1;
+    			color: #999;
+    			padding: 10px;
+    		}
+
+    		.print{
+    			flex: 1;
+    			background: #488aff;
+    			color: white;
+    			padding: 10px;
+    			border-radius: 10px;
+    			font-weight: bold;
+
+    			&:active{
+    				opacity: .5;
+    			}
+    		}
+    	}
+    }
+	}
+
+	line{
+		stroke: #488aff !important;
+	}
+
+	.spinner-md-crescent circle{
+		stroke: #488aff !important;
+	}
+
+	.content-produk{
+		margin-top: 1px;
+		.scroll-content{
+			border-top: none !important;
+			margin-bottom: 0 !important;
+		}
+	}
+}

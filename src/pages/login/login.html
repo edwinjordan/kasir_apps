@@ -1,0 +1,45 @@
+<!-- <ion-header>
+	<ion-navbar>
+		<ion-title>
+			Return Penjualan
+		</ion-title>
+	</ion-navbar>
+</ion-header> -->
+
+<ion-content>
+	<div class="c-setting" (click)="setting()">
+		<ion-icon name="md-settings"></ion-icon>
+	</div>
+	<div class="c-form">
+		<div class="title">Viyon Collection</div>
+		<form (ngSubmit)="login()">
+			<ion-item>
+				<ion-label color="primary" stacked>Username</ion-label>
+				<ion-input placeholder="Tulis Username" [(ngModel)]="username" name="username"></ion-input>
+			</ion-item>
+			<ion-item>
+				<ion-label color="primary" stacked>Password</ion-label>
+				<ion-input type="password" placeholder="Tulis Password" [(ngModel)]="password" name="password"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Area</ion-label>
+        <ion-select [(ngModel)]="area" name="area">
+          <ion-option [value]="null" selected>-- Pilih Area -- </ion-option>
+          <ion-option *ngFor="let k of AreaUI" value="{{k.fc_kdarea}}">{{k.fv_nmarea}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Divisi</ion-label>
+        <ion-select [(ngModel)]="divisi" name="divisi">
+          <ion-option [value]="null" selected>-- Pilih Divisi -- </ion-option>
+          <ion-option *ngFor="let k of DivisiUI" value="{{k.fc_kddivisi}}">{{k.fv_nmdivisi}}</ion-option>
+        </ion-select>
+      </ion-item>
+			<button ion-button class="login-btn">
+				<div *ngIf="!masukLoading" class="text">MASUK</div>
+				<ion-spinner *ngIf="masukLoading"></ion-spinner>
+			</button>
+		</form>
+	</div>
+
+</ion-content>

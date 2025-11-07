@@ -1,0 +1,85 @@
+<ion-header>
+	<ion-navbar>
+		<ion-title>
+			Print Nota
+		</ion-title>
+		<ion-buttons end>
+      <button ion-button icon-only (click)="setting()">
+    		<ion-icon name="md-settings" style="color: black"></ion-icon>
+      </button>
+    </ion-buttons>
+	</ion-navbar>
+</ion-header>
+
+<ion-content>
+	<ion-grid>
+		<ion-row class="row-content">
+			<ion-col class="col-nota">
+				<div style="display: flex; border-bottom: 2px solid #488aff; margin-bottom: 1px;">
+					<ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput()" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 1; padding-right: 0;"></ion-searchbar>
+					<div style="display: flex; align-items: center;">
+						<ion-item>
+							<ion-select [(ngModel)]="pilihanCari" style="max-width: unset;">
+								<ion-option value="3">No Faktur</ion-option>
+								<ion-option value="4">No Pelanggan</ion-option>
+								<ion-option value="5">Nama Pelanggan</ion-option>
+							</ion-select>
+						</ion-item>
+					</div>
+				</div>
+
+				<ion-content class="content-produk" drag-content="false">
+					<ion-refresher (ionRefresh)="refresh($event)">
+						<ion-refresher-content></ion-refresher-content>
+					</ion-refresher>
+					<ion-grid>
+						<ion-row>
+              <ion-item>
+                <button ion-item (tap)="listBTDevice()">
+                  Select Printer
+                </button>
+              </ion-item>
+              <ion-item>
+                <button ion-item (tap)="testConnectPrinter()">
+                  Test Connection
+                </button>
+              </ion-item>
+              <ion-item>
+                <button ion-item (tap)="testPrinter()">
+                  Test Print
+                </button>
+              </ion-item>
+							<ion-col col-md-4 col-sm-6 col-12 *ngFor="let c of dataHasilCariUi; let i = index;" (tap)="listBTDevice()">
+								<ion-card [class.nota-pilih]="c.fn_idpenjualan == detailNota?.fn_idpenjualan" class="card-nota">
+									<ion-card-content>
+										<div class="c-text">
+											<div><b>No Nota </b>: <div class="nota">{{c.fc_nofaktur}}</div></div>
+											<div><b>Pelanggan </b>: <div><b>{{c.fv_nama? c.fv_nama : 'Umum'}}</b></div></div>
+											<div><b>Tgl </b>: <div>{{c.tanggal}}</div></div>
+											<!-- <div><b>Total </b>: <div class="nota">{{c.total_harga | currency:'Rp. ':'symbol':'.0':'id'}},-</div></div> -->
+										</div>
+										<div class="c-harga">
+										</div>
+									</ion-card-content>
+								</ion-card>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+				</ion-content>
+			</ion-col>
+		</ion-row>
+	</ion-grid>
+	<div *ngIf="showNotaModal" class="backdrop" (click)="showNotaModal = false;"></div>
+	<div *ngIf="showNotaModal" class="nota-print">
+		<div class="modal">
+			<div class="header">Print Nota&nbsp;<b>{{notaPilih.fc_nofaktur}}</b></div>
+			<div class="nota">
+				<div id="nota" [innerHTML]="notaPrint" ></div>
+			</div>
+			<div class="footer">
+				<div class="batal" (click)="showNotaModal = false;">Batal</div>
+				<div class="print" (click)="printNota()">Print</div>
+			</div>
+		</div>
+	</div>
+</ion-content>

@@ -1,0 +1,188 @@
+<ion-header>
+	<ion-navbar>
+		<ion-title>
+			Piutang Penjualan
+		</ion-title>
+		<ion-buttons end>
+      <button ion-button icon-only (click)="setting()">
+    		<ion-icon name="md-settings" style="color: black"></ion-icon>
+      </button>
+    </ion-buttons>
+	</ion-navbar>
+</ion-header>
+
+
+<ion-content>
+    <ion-grid>
+		<ion-row class="m-row">
+            <ion-col col-md-7 col-12 class="col-nota">
+				<ion-searchbar [(ngModel)]="textCari" (ionInput)="cariOnInput($event)" (ionCancel)="cariOnCancel()" (keypress)="inputPress($event)" style="flex: 0; border-bottom: 2px solid #488aff; margin-bottom: 1px;"></ion-searchbar>
+				<ion-content class="content-produk" drag-content="false">
+					<ion-refresher (ionRefresh)="refresh($event)">
+						<ion-refresher-content></ion-refresher-content>
+					</ion-refresher>
+					<ion-grid>
+						<ion-row>
+							<ion-col col-lg-4 col-md-6 col-sm-6 col-12 *ngFor="let c of notaUi; let i = index;" (click)="notaPilih = c; showModal = true;">
+								<ion-card class="card-nota" [class.nota-pilih]="c == notaPilih">
+									<ion-card-content>
+										<div class="c-text">
+											<div><b>No Nota </b>: <div class="nota">{{c.fc_nofaktur}}</div></div>
+											<div><b>Pelanggan </b>: <div>{{c.fv_nama? c.fv_nama : '-'}}</div></div>
+											<div><b>Tgl </b>: <div>{{c.tanggal}}</div></div>
+                      						<div><b>Piutang </b>: <div>{{c.fm_selisih * -1| currency:'Rp. ':'symbol':'.0':'id'}}</div></div>
+										</div>
+										<div class="c-harga">
+										</div>
+									</ion-card-content>
+								</ion-card>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+				</ion-content>
+			</ion-col>
+            <ion-col col-md-5 col-12 class="col-detail" [class.modalShow]="showModal">
+				<div class="btn-samping" (click)="showModal = !showModal"><ion-icon name="arrow-back"></ion-icon></div>
+				<div class="c-detail">
+					<ion-item>
+						<ion-label color="primary" fixed>Tanggal</ion-label>
+						<ion-input [value]="notaPilih?.tanggal? notaPilih?.tanggal : '-'"  disabled></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>No Faktur</ion-label>
+						<ion-input [value]="notaPilih?.fc_nofaktur? notaPilih?.fc_nofaktur : '-'" disabled></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>Pelanggan</ion-label>
+						<ion-input [value]="!notaPilih? '-' : notaPilih.fv_nama? notaPilih?.fv_nama : '-'" disabled></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>Alamat</ion-label>
+						<ion-input [value]="notaPilih?.fv_alamat? notaPilih?.fv_alamat : '-'" disabled></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>No Tlp</ion-label>
+						<ion-input [value]="notaPilih?.fc_notelp? notaPilih?.fc_notelp : '-'" disabled></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-label color="primary" fixed>Catatan</ion-label>
+						<ion-input [value]="notaPilih?.fv_memo? notaPilih?.fv_memo : '-'" disabled></ion-input>
+					</ion-item>
+					<div style="height: 150px;"></div>
+				</div>
+				<div class="c-footer">
+					<ion-grid class="c-total">
+						<ion-row>
+							<ion-col col-md-5 col-4 style="font-size: 15pt">Total</ion-col>
+							<ion-col *ngIf="notaPilih?.fm_dpp" col-md-7 col-8 class="harga">{{notaPilih?.fm_selisih * -1 | currency:'Rp. ':'symbol':'.0':'id'}},-</ion-col>
+							<!-- <ion-col *ngIf="notaPilih?.total_harga" col-md-7 col-8 class="harga">{{notaPilih?.total_harga | currency:'Rp. ':'symbol':'.0':'id'}},-</ion-col> -->
+							<ion-col *ngIf="!notaPilih?.fm_dpp" col-md-7 col-8 class="harga">Rp 0,-</ion-col>
+						</ion-row>
+						<ion-row class="c-btn">
+							<ion-col style="flex: 0; display: flex;">
+								<button class="batal" (click)="notaPilih = null">
+									<!-- <u>Batal</u> -->
+									<ion-icon name="close"></ion-icon>
+								</button>
+							</ion-col>
+							<ion-col style="padding: 10px;">
+								<button class="simpan" [disabled]="!notaPilih" (click)="lihatNota()">Lihat Nota</button>
+							</ion-col>
+							<ion-col style="padding: 10px 10px 10px 0;">
+								<button class="simpan" [disabled]="!notaPilih" (click)="pembayaran()">BAYAR</button>
+							</ion-col>
+						</ion-row>
+					</ion-grid>
+				</div>
+			</ion-col>
+        </ion-row>
+    </ion-grid>
+    <div [style.display]="showModal? 'block' : 'none'" class="modal-backdrop" (click)="showModal = false"></div>
+
+    <div *ngIf="showNotaModal" class="c-modal-pelanggan">
+      <div class="modal" style="width: 30%; padding: 0 16px;">
+        <div [innerHtml]="notaPrintHtml" style="flex: 1; overflow: scroll;"></div>
+        <div class="button" style="justify-content: flex-end; padding: 10px 0;">
+          <div (click)="showNotaModal = false; notaPrintHtml = null" style="background: #488aff; color: white; border-radius: 10px; flex: 0; padding: 10px 36px;">Selesai</div>
+        </div>
+      </div>
+    </div>
+
+    <div [ngStyle]="showNotaModal? {'opacity': '1', 'z-index' : '1'} :  {'opacity': '0', 'z-index' : '-1'}" class="modal-pelanggan-backdrop" (click)="showNotaModal = false; notaPrintHtml = null;"></div>
+</ion-content>
+<div *ngIf="showPembayaran" style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 9;" (click)="showPembayaran = false"></div>
+<div *ngIf="showPembayaran" class="modal-pembayaran">
+	<div class="c-modal">
+		<div class="header">Pembayaran</div>
+
+		<div class="c-content">
+			<!-- <div *ngSwitchCase="'Bayar'"> -->
+			<div>
+				<ion-list>
+
+					<ion-item>
+						<ion-label color="primary" fixed>Total Tagihan</ion-label>
+						<!-- <div item-content style="color: #488aff; font-weight: bold;">{{notaPilih?.total_harga | currency:'Rp. ':'symbol':'.0':'id'}},-</div> -->
+						<div item-content style="color: #488aff; font-weight: bold;">{{notaPilih?.fm_selisih * -1 | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+                    </ion-item>
+
+                    <ion-item>
+						<ion-label color="primary" fixed>Keuangan</ion-label>
+						<ion-select [(ngModel)]="jenisKeuangan">
+							<ion-option [value]="null" selected>-- Pilih Keuangan -- </ion-option>
+							<ion-option *ngFor="let k of jenisKeuanganUI; let i = index" [value]="k">{{k.nama_keuangan}}</ion-option>
+						</ion-select>
+					</ion-item>
+                    <ion-item style="display: flex;">
+						<ion-label color="primary" fixed style="flex: 0;">Bayar</ion-label>
+						<!-- <ion-input type="number" [(ngModel)]="potonganPenjualan"></ion-input> -->
+						<div item-content class="sugesti">
+							<div class="c-uang">
+								<div *ngFor="let u of uang; let i = index;" class="uang" (click)="bayarKeuangan = bayarKeuangan + u">{{u | currency:'Rp. ':'symbol':'.0':'id'}}</div>
+								<div style="height: 10px; width: 15px; flex-shrink: 0;"></div>
+							</div>
+						</div>
+						<div item-content style="display: flex; width: 120px; height: 100%; flex-shrink: 0;">
+							<div style="padding-right: 5px; display: flex;justify-content: center;flex-direction: column;text-align: center;font-weight: normal; font-size: 12pt; padding-bottom: 2px; color: #999;">Rp. </div>
+
+
+							<input currencyMask type="tel" [options]="{ prefix: '', align: 'right', precision: 0, thousands: '.', allowNegative: false, suffix: ',-' }" name="bayarKeuangan" placeholder="0,-" [(ngModel)]="bayarKeuangan" style="border: none; font-size: 12pt; border-bottom: 1px solid; padding: 10px 0; width: 100%;"/>
+						</div>
+						<div item-content style="height: 100%; display: flex; align-items: center; padding-left: 16px;">
+							<ion-icon name="close-circle" (click)="bayarKeuangan = 0"></ion-icon>
+						</div>
+					</ion-item>
+
+                    <ion-item>
+						<ion-label color="primary" fixed>Keterangan</ion-label>
+                        <div item-content style="display: flex; width: 220px; height: 100%; flex-shrink: 0;">
+                            <ion-textarea placeholder="Tulis Keterangan Disini..." [(ngModel)]="ketReturn"></ion-textarea>
+						</div>
+					</ion-item>
+
+                    <ion-item>
+						<ion-label color="primary" fixed>
+
+                        <div *ngIf="(bayarKeuangan) - (notaPilih?.fm_selisih * -1) >= 0">Kembalian</div>
+						<div *ngIf="(bayarKeuangan) - (notaPilih?.fm_selisih * -1) < 0">Kekurangan</div></ion-label>
+
+                        <div item-content style="font-weight: bold;" [style.color]="">{{ (bayarKeuangan) - (notaPilih?.fm_selisih * -1) | currency:'Rp. ':'symbol':'.0':'id'}},-</div>
+						<!-- <div item-content *ngIf="(saldo + (potonganPembayaran + bayarKeuangan + bayarKeuanganDebit + bayarKeuanganTransfer) - (notaPilih['selisih'] * -1) - biayaEkspedisi) > 0" style="font-weight: bold; color: green" [style.color]="">{{(saldo + (potonganPembayaran + bayarKeuangan + bayarKeuanganDebit + bayarKeuanganTransfer) - (notaPilih?.selisih * -1) - biayaEkspedisi) | currency:'Rp. ':'symbol':'.0':'id'}},-</div> -->
+					</ion-item>
+
+					<br>
+					<br>
+					<br>
+				</ion-list>
+			</div>
+		</div>
+
+		<div class="c-btn">
+			<div class="batal-btn"><div (click)="modalBatal()" style="width: fit-content; margin: auto;">BATAL</div></div>
+			<button class="bayar-btn" (click)="bayar()">
+				<div *ngIf="!bayarLoading" class="text">BAYAR</div>
+				<ion-spinner *ngIf="bayarLoading"></ion-spinner>
+			</button>
+		</div>
+	</div>
+</div>
