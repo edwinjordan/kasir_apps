@@ -1,22 +1,147 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>Home</ion-title>
+  <ion-navbar color="primary">
+    <ion-title>
+      <ion-icon name="md-analytics" style="vertical-align: middle; margin-right: 8px;"></ion-icon>
+      Dashboard
+    </ion-title>
     <ion-buttons end>
 			<button ion-button icon-only (click)="setting()">
-				<ion-icon name="md-settings" style="color: black"></ion-icon>
+				<ion-icon name="md-settings"></ion-icon>
 			</button>
 		</ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <h2>Welcome to Ionic!</h2>
-  <p>
-    This starter project comes with simple tabs-based layout for apps
-    that are going to primarily use a Tabbed UI.
-  </p>
-  <p>
-    Take a look at the <code>src/pages/</code> directory to add or change tabs,
-    update any existing page or create new pages.
-  </p>
+<ion-content>
+  <ion-refresher (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Welcome Section -->
+  <div class="welcome-section" padding>
+    <h2 class="welcome-title">Selamat Datang, {{ userData?.fc_nmkaryawan || 'User' }}! 👋</h2>
+    <p class="welcome-subtitle">{{ getCurrentDate() }}</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-container" padding>
+    <ion-row>
+      <ion-col col-6>
+        <ion-card class="stat-card stat-card-blue">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="md-calendar"></ion-icon>
+            </div>
+            <div class="stat-value">{{ formatToMillions(todaySales) }}</div>
+            <div class="stat-label">Penjualan Hari Ini</div>
+            <div class="stat-detail">{{ todayTransactions }} Transaksi</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col col-6>
+        <ion-card class="stat-card stat-card-green">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="md-trending-up"></ion-icon>
+            </div>
+            <div class="stat-value">{{ formatToMillions(weekSales) }}</div>
+            <div class="stat-label">Minggu Ini</div>
+            <div class="stat-detail">7 Hari Terakhir</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col col-12>
+        <ion-card class="stat-card stat-card-purple">
+          <ion-card-content>
+            <div class="stat-icon">
+              <ion-icon name="md-stats"></ion-icon>
+            </div>
+            <div class="stat-value">{{ formatToMillions(monthSales) }}</div>
+            <div class="stat-label">Total Bulan Ini</div>
+            <div class="stat-detail">{{ getCurrentMonth() }}</div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </div>
+
+  <!-- Period Selector -->
+  <div padding-horizontal>
+    <ion-segment [(ngModel)]="selectedPeriod" (ionChange)="onPeriodChange()" color="primary">
+      <ion-segment-button value="week">
+        Minggu
+      </ion-segment-button>
+      <ion-segment-button value="month">
+        Bulan
+      </ion-segment-button>
+      <ion-segment-button value="year">
+        Tahun
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Sales Chart -->
+  <ion-card class="chart-card">
+    <ion-card-header>
+      <div class="card-header">
+        <ion-icon name="md-trending-up" class="header-icon"></ion-icon>
+        <span class="header-title">Grafik Penjualan</span>
+      </div>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chart-container">
+        <canvas #salesChart></canvas>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Top Products Chart -->
+  <ion-card class="chart-card">
+    <ion-card-header>
+      <div class="card-header">
+        <ion-icon name="md-trophy" class="header-icon"></ion-icon>
+        <span class="header-title">Produk Terlaris</span>
+      </div>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chart-container">
+        <canvas #productChart></canvas>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Top Products List -->
+  <ion-card class="products-list-card">
+    <ion-card-header>
+      <div class="card-header">
+        <ion-icon name="md-list" class="header-icon"></ion-icon>
+        <span class="header-title">Detail Produk Terlaris</span>
+      </div>
+    </ion-card-header>
+    <ion-card-content class="products-list">
+      <ion-list>
+        <ion-item *ngFor="let product of topProducts; let i = index" class="product-item">
+          <div class="product-rank" item-start>
+            <div class="rank-badge" [ngClass]="'rank-' + (i + 1)">{{ i + 1 }}</div>
+          </div>
+          <div class="product-info">
+            <h2 class="product-name">{{ product.name }}</h2>
+            <p class="product-qty">{{ product.qty }} Unit Terjual</p>
+          </div>
+          <div class="product-revenue" item-end>
+            <div class="revenue-amount">{{ formatCurrency(product.revenue) }}</div>
+          </div>
+        </ion-item>
+      </ion-list>
+      
+      <div *ngIf="!topProducts || topProducts.length === 0" class="no-data">
+        <ion-icon name="md-information-circle"></ion-icon>
+        <p>Belum ada data produk</p>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div padding style="height: 20px;"></div>
 </ion-content>

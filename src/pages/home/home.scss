@@ -1,3 +1,212 @@
 page-home {
+  .welcome-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    margin: 16px;
+    padding: 20px !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 
+    .welcome-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+
+    .welcome-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 0;
+    }
+  }
+
+  .stats-container {
+    padding-top: 0 !important;
+
+    .stat-card {
+      margin: 8px 0;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+      ion-card-content {
+        padding: 16px;
+        text-align: center;
+
+        .stat-icon {
+          font-size: 32px;
+          margin-bottom: 8px;
+          opacity: 0.9;
+        }
+
+        .stat-value {
+          font-size: 20px;
+          font-weight: 700;
+          margin: 8px 0;
+        }
+
+        .stat-label {
+          font-size: 12px;
+          font-weight: 500;
+          margin: 4px 0;
+          opacity: 0.8;
+        }
+
+        .stat-detail {
+          font-size: 11px;
+          margin-top: 4px;
+          opacity: 0.7;
+        }
+      }
+
+      &.stat-card-blue {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      &.stat-card-green {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+      }
+
+      &.stat-card-purple {
+        background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+        color: white;
+      }
+    }
+  }
+
+  .chart-card {
+    margin: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .header-icon {
+        font-size: 20px;
+        color: #667eea;
+      }
+
+      .header-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+      }
+    }
+
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+  }
+
+  .products-list-card {
+    margin: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .products-list {
+      padding: 0;
+
+      ion-list {
+        margin: 0;
+      }
+
+      .product-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .product-rank {
+          margin-right: 12px;
+
+          .rank-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+
+            &.rank-1 {
+              background: linear-gradient(135deg, #FFD700, #FFA500);
+              box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+            }
+
+            &.rank-2 {
+              background: linear-gradient(135deg, #C0C0C0, #808080);
+              box-shadow: 0 2px 8px rgba(192, 192, 192, 0.4);
+            }
+
+            &.rank-3 {
+              background: linear-gradient(135deg, #CD7F32, #8B4513);
+              box-shadow: 0 2px 8px rgba(205, 127, 50, 0.4);
+            }
+
+            &.rank-4,
+            &.rank-5 {
+              background: linear-gradient(135deg, #667eea, #764ba2);
+              box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            }
+          }
+        }
+
+        .product-info {
+          flex: 1;
+
+          .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 4px 0;
+          }
+
+          .product-qty {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+          }
+        }
+
+        .product-revenue {
+          text-align: right;
+
+          .revenue-amount {
+            font-size: 14px;
+            font-weight: 700;
+            color: #667eea;
+          }
+        }
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+
+        ion-icon {
+          font-size: 48px;
+          opacity: 0.5;
+        }
+
+        p {
+          margin-top: 12px;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  ion-segment {
+    margin: 16px 0;
+  }
 }

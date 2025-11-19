@@ -1,16 +1,82 @@
 <ion-header>
-
   <ion-navbar>
-    <ion-title>Printer List</ion-title>
+    <ion-title>Pilih Printer Bluetooth</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
-
 <ion-content>
-<ion-list>
-  <ion-item *ngFor="let item of printerList" (tap)="select(item)">
-    {{item.name}} {{item.id}}
-  </ion-item>
-</ion-list>
+  <!-- Paired Devices Section -->
+  <div padding>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Perangkat Terpasang</h3>
+      <button ion-button small (click)="refreshList()">
+        <ion-icon name="refresh"></ion-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <ion-list *ngIf="printerList && printerList.length > 0">
+    <ion-item *ngFor="let device of printerList" (click)="select(device)">
+      <ion-icon name="bluetooth" item-start></ion-icon>
+      <h2>{{ device.name }}</h2>
+      <p>{{ device.address || device.id }}</p>
+      <ion-badge item-end color="secondary" *ngIf="isSavedPrinter(device)">
+        Tersimpan
+      </ion-badge>
+      <button ion-button clear item-end (click)="testPrint(device, $event)">
+        <ion-icon name="print"></ion-icon>
+        Test
+      </button>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="!printerList || printerList.length === 0" padding text-center>
+    <ion-icon name="bluetooth" style="font-size: 64px; color: #ccc;"></ion-icon>
+    <p>Tidak ada perangkat Bluetooth yang terpasang</p>
+    <p text-wrap style="color: #999; font-size: 12px;">
+      Pastikan Anda sudah memasangkan (pair) printer Bluetooth di pengaturan perangkat
+    </p>
+  </div>
+
+  <!-- Unpaired Devices Section -->
+  <div padding style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3>Cari Perangkat Baru</h3>
+      <button ion-button small (click)="searchUnpairedDevices()" [disabled]="isSearching">
+        <ion-icon name="search"></ion-icon>
+        {{ isSearching ? 'Mencari...' : 'Cari' }}
+      </button>
+    </div>
+  </div>
+
+  <ion-list *ngIf="unpairedDevices && unpairedDevices.length > 0">
+    <ion-item *ngFor="let device of unpairedDevices" (click)="select(device)">
+      <ion-icon name="bluetooth" item-start color="medium"></ion-icon>
+      <h2>{{ device.name }}</h2>
+      <p>{{ device.address || device.id }}</p>
+      <ion-badge item-end color="light">Belum Dipasangkan</ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <!-- Instructions -->
+  <div padding style="margin-top: 30px; background-color: #f4f4f4; border-radius: 8px;">
+    <h4 style="margin-top: 0;">
+      <ion-icon name="information-circle"></ion-icon>
+      Petunjuk Koneksi
+    </h4>
+    <ol style="font-size: 13px; padding-left: 20px;">
+      <li>Pastikan Bluetooth di perangkat sudah aktif</li>
+      <li>Nyalakan printer Bluetooth Anda</li>
+      <li>Jika printer belum muncul, pasangkan (pair) di pengaturan Bluetooth perangkat terlebih dahulu</li>
+      <li>Pilih printer dari daftar untuk terhubung</li>
+      <li>Gunakan tombol "Test" untuk mencoba print</li>
+    </ol>
+  </div>
+
 </ion-content>
